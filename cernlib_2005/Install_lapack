@@ -27,39 +27,9 @@ q
 !
 
 # Modify Lapack Make for gcc (i686 and x86_64 architectures)
-
 [ -z "$ARCH" ] && ARCH=`uname -m`
-GCCVERSION=`gcc -v 2>&1 | grep version | cut -d' ' -f3 | cut -c1 | tail -1`
+[ -z "$FC" ] && . DetermineFC.sh
 
-if [ "${GCCVERSION}" = "3" ]; then
-    mv make.inc make.inc.orig
-    ed -s make.inc.orig > /dev/null <<!
-41,43c
-BLASLIB      = ../../blas\$(PLAT).a
-.
-28c
-LOADOPTS = -O -fPIC
-.
-26c
-LOADER   = g77
-.
-24c
-NOOPT    = -fPIC
-.
-22c
-OPTS     = -O -fPIC
-.
-19c
-FORTRAN  = g77
-.
-11c
-PLAT = _$ARCH
-.
-w make.inc
-q
-!
-fi
-if [ "${GCCVERSION}" = "4" ]; then
 mv make.inc make.inc.orig
 ed -s make.inc.orig > /dev/null <<!
 41,43c
@@ -69,7 +39,7 @@ BLASLIB      = ../../blas\$(PLAT).a
 LOADOPTS = -O -fPIC
 .
 26c
-LOADER   = gfortran
+LOADER   = $FC
 .
 24c
 NOOPT    = -fPIC
@@ -78,7 +48,7 @@ NOOPT    = -fPIC
 OPTS     = -O -fPIC
 .
 19c
-FORTRAN  = gfortran
+FORTRAN  = $FC
 .
 11c
 PLAT = _$ARCH
@@ -86,35 +56,6 @@ PLAT = _$ARCH
 w make.inc
 q
 !
-fi
-if [ "${GCCVERSION}" = "5" ]; then
-mv make.inc make.inc.orig
-ed -s make.inc.orig > /dev/null <<!
-41,43c
-BLASLIB      = ../../blas\$(PLAT).a
-.
-28c
-LOADOPTS = -O -fPIC
-.
-26c
-LOADER   = gfortran
-.
-24c
-NOOPT    = -fPIC
-.
-22c
-OPTS     = -O -fPIC
-.
-19c
-FORTRAN  = gfortran
-.
-11c
-PLAT = _$ARCH
-.
-w make.inc
-q
-!
-fi
 
 # use INTRINSIC ETIME
 sed -i -e '{s/EXTERNAL           ETIME/INTRINSIC          ETIME/}' SRC/dsecnd.f
