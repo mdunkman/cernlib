@@ -28,30 +28,35 @@ cat > comptest.F <<EOF
       end
 EOF
 GCCVSN=`cpp -dM comptest.F | grep __VERSION__ | cut -d" " -f3 | cut -c 2`
-FC=" "
-[ "$GCCVSN" = "3" ]&&FC=g77
-[ "$GCCVSN" = "4" ]&&FC=gfortran
-[ "$GCCVSN" = "5" ]&&FC=gfortran
-[ "$GCCVSN" = "6" ]&&FC=gfortran
-if [ "$GCCVSN" = " " ]; then
-  echo " "
-  echo "====================================="
-  echo "Expected GCC compiler suite not found"
-  echo "====================================="
-  rm -f comptest.*
-  exit 1
+FC=""
+if [ "$GCCVSN" -lt "4" ]
+then
+  FC=g77
 else
-  check="Checking for Fortran Compiler... "
+  FC=gfortran
+fi
+
+if [ "x$FC" != "x" ]
+then
+  echo "Checking FORTRAN compiler '${FC}' ... \c"
   $FC -c comptest.F >/dev/null 2>&1
-  if test -s comptest.o; then
-    echo "${check}${FC}"
+  if [ -s comptest.o ]
+  then
+    echo "success"
   else
-    echo "${check} no"
-    rm -f comptest.*
-    exit 1
+    echo "failure"
+    FC=""
   fi
 fi
 rm -f comptest.*
+
+if [ "x$FC" = "x" ]
+then
+  echo "==================================================================="
+  echo "Expected GCC compiler suite not found."
+  echo "==================================================================="
+  exit 1
+fi
 export ARCH
 export FC
 
