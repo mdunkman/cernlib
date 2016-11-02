@@ -23,7 +23,7 @@ export CERN_LEVEL=`gunzip -c src_Imakefile.tar.gz | tar tf - | awk -F/ '{print $
 
 ARCH=`uname -m`
 export ARCH
-./DetermineFC.sh
+. DetermineFC.sh
 
 echo "======================================"
 echo "Configuration summary"
